@@ -1,0 +1,55 @@
+<div id="log_in">
+	<div id="log_in_form">
+	
+		<div class="container">	
+			<h1 class="text-center">What's Your Word?</h1>
+			<div class="row">
+				<div class="col-sm-offset-4 col-sm-4">
+					<div class="jumbotron rounded">
+						<div class="header">
+							<h3 class="text-center">Log In</h3>
+						</div>
+						<div class="body">					
+							<div class="row">
+								<div class="col-sm-offset-2 col-sm-8">							
+									<form id="formLogIn" ng-submit="log_in()">
+										
+										<!-- Email and password -->
+										<div class="form-group">
+											<input type="email" class="form-control" id="email" placeholder="Email Address" ng-model="user.email">
+											<input type="password" class="form-control" id="password" placeholder="Password" ng-model="user.password">
+										</div>
+										
+										<div class="row">
+											<div class="col-sm-12 text-center">
+												<button type="submit" class="btn btn-default" >Log in</button>
+												<p>{{user.message}}</p>
+<!--												
+												<p>Email: {{user.email}}</p>
+												<p>Password: {{user.password}}</p>
+												<p>Message: {{message}}</p>
+-->												
+											</div>
+										</div>	
+									</form>
+									
+									<p><a href="#" ng-Click="">Forgot password?</a></p>
+									<p><a href="sign_up">Don't have an account?</a></p>
+								</div>
+							</div>
+						</div>	
+						<div class="footer text-center">
+							<div class="row">
+								<div class="col-sm-12">
+									<button>Login with Facebook</button>
+								</div>	
+							</div>	
+						</div>
+								
+					</div>	
+				</div>	
+			</div>
+		</div>
+		
+	</div>
+</div>		

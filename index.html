@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en" ng-app="myIntentProject">
+<head>
+	<meta charset="utf-8">
+	<title>MyIntent</title>
+  
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-loading-bar/0.7.1/loading-bar.min.css">
+	<link rel="stylesheet" href="app/css/custom.css">
+
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- Using non-minified code for development because easier to debug
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+-->	
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular-route.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-loading-bar/0.7.1/loading-bar.min.js"></script>
+	<script src="app/modules/ngStorage.js"></script>
+	
+	<!-- Routes -->
+	<script src="app/app.js"></script>
+	
+	<!-- Controllers -->
+	<script src="app/controllers/sessionController.js"></script>
+	<script src="app/controllers/userController.js"></script>
+	<script src="app/controllers/wordController.js"></script>
+	
+	<!-- Services-->
+	<script src="app/services/sessionServices.js"></script>
+	<script src="app/services/userServices.js"></script>
+	<script src="app/services/wordServices.js"></script>
+	<script src="app/services/authorizationInterceptor.js"></script>
+	
+	<!-- required to use "pretty urls" for AngularJS -->
+	<base href="/" />
+	
+</head>
+<body>
+	<nav class="navbar navbar-default navbar-fixed-top" data-ng-show="token">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#">Project name</a>
+			</div>
+			<div id="navbar" class="navbar-collapse collapse">
+				<ul class="nav navbar-nav">
+					<li class="active"><a href="#">Home</a></li>
+					<li><a href="#about">About</a></li>
+					<li><a href="#contact">Contact</a></li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right" ng-controller="UserController">
+					<li><a href="#">[AVATAR] </a></li>
+					<li><a href="#" ng-bind="firstName"></a></li>
+					<li><a href="#">[INFO]</a></li>
+				</ul>
+			</div><!--/.nav-collapse -->
+		</div>
+    </nav>
+
+	<!-- injection point for angular views -->
+	<div id="view" ng-view>
+		(THIS SHOULD BE OVERWRITTEN BY A TEMPLATE OR PARTIAL)
+	</div>
+
+</body>
+</html>

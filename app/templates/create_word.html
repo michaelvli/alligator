@@ -1,0 +1,27 @@
+<div id="create_word">
+	<div id="create_word_form">
+		
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-offset-2 col-sm-8">
+					<h1>New Word</h1>
+					<form id="formCreateWord" ng-submit="createWord()">
+						<!-- Word -->
+						<div class="form-group">
+							<label for="word">Word (up to 12 characters)</label>
+							<input type="text" class="form-control" id="word" placeholder="Enter a meaningful word" ng-model="word.word">
+						</div>
+						<!-- Story -->
+						<div class="form-group">
+							<label for="story">Story</label>
+							<textarea class="form-control" rows="4" cols="50" name="story" id="story" placeholder="What's the story behind the word?" ng-model="word.story"></textarea>
+						</div>
+
+						<button type="submit" class="btn btn-default">Continue</button>
+					</form>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+</div>

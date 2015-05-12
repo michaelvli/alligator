@@ -1,0 +1,38 @@
+/* app css stylesheet */
+
+/* 
+	Background image before user is logged in -	https://css-tricks.com/perfect-full-page-background-image/
+*/
+html { 
+//  background: url(images/bg.jpg) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+body {
+  padding-top: 50px;  
+}
+
+
+.jumbotron.rounded{
+	border-radius: 25px;
+	padding: 5px;
+}
+
+.jumbotron .header{
+	border-bottom: 1px solid white;
+	width: 100%;
+}
+
+.jumbotron .footer{
+	border-top: 1px solid white;
+	width: 100%;
+}
+
+
+/* DEBUG */
+.vee-red{
+	border: 1px solid red;
+}

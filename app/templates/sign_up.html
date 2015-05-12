@@ -1,0 +1,63 @@
+<div id="sign_up">
+	<div id="sign_up_form">
+	
+		<div class="container">	
+			<h1 class="text-center">What's Your Word?</h1>
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-offset-4 col-sm-4">
+						<div class="jumbotron rounded">
+							<div class="header">
+								<h3 class="text-center">Sign Up</h3>
+							</div>
+							<div class="body">					
+								<div class="row">
+									<div class="col-sm-offset-2 col-sm-8">
+									
+										<form id="formSignUp" ng-submit="sign_up()">
+											<!-- First and last name -->
+											<div class="form-group">
+												<input type="text" class="form-control" id="firstName" placeholder="First Name" ng-model="user.firstName">
+												<input type="text" class="form-control" id="lastName" placeholder="Last Name" ng-model="user.lastName">
+											</div>
+											
+											<!-- Email and password -->
+											<div class="form-group">
+												<input type="email" class="form-control" id="email" placeholder="Email Address" ng-model="user.email">
+												<input type="password" class="form-control" id="password" placeholder="Password" ng-model="user.password">
+											</div>
+											
+											<div class="row">
+												<div class="col-sm-12 text-center">
+													<button type="submit" class="btn btn-default">Sign up</button>
+													<p>{{user.message}}</p>													
+<!--													
+													<p>First: {{user.firstName}}</p>
+													<p>Last: {{user.lastName}}</p>
+													<p>Email: {{user.email}}</p>
+													<p>Password: {{user.password}}</p>
+-->													
+												</div>
+											</div>	
+										</form>
+
+										<span> Already have an acount?</span><a href="log_in" >Log in</a>
+									</div>
+								</div>
+							</div>	
+							<div class="footer text-center">
+								<div class="row">
+									<div class="col-sm-12">
+										<button>Sign up with Facebook</button>
+									</div>	
+								</div>	
+							</div>
+									
+						</div>	
+					</div>	
+				</div>		
+			</div>
+		</div>
+		
+	</div>
+</div>			
