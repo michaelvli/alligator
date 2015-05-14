@@ -92,8 +92,8 @@ class User {
 	public function checkEmail(){
 		// $objects of dbHandler class retrieve information from databases
 		$db = new dbHandler();
-//		$row_obj = $db->select_Users_email($this->email); 
-		$row_obj = $db->selectQuery("users", $this->email);
+		$row_obj = $db->select_Users_email($this->email); 
+//		$row_obj = $db->selectQuery("users", $this->email);
 		return $row_obj;
 	}
 

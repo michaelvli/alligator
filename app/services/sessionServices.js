@@ -13,9 +13,10 @@
 
 var services = angular.module("services", []);
 
-services.factory("sessionServices", function($http, urls){
+services.factory("sessionServices", function($http, urls, $localStorage, $sessionStorage){
 	
 	var service = {}; // declaration of object that will be returned to calling controller
+	var token;
 	
 	/* public methods via the service object below: */
 		
@@ -32,7 +33,28 @@ services.factory("sessionServices", function($http, urls){
 		var loginRequest = $http(request).success(successResponse).error(errorResponse);
 		
 		return loginRequest;
-	}
+	};
 	
+	service.setToken = function(tokenValue){
+		token = tokenValue;
+		$localStorage.token = tokenValue;
+	};	
+
+	service.getToken = function(){
+		if (token == "" || token == undefined)
+		{
+			token = $localStorage.token;
+		}	
+		return token;
+	};
+
+	service.loggedIn = function(){
+		if (service.getToken() == undefined || service.getToken() == "")
+		{
+			return false;
+		}
+		return true;
+	};
+		
 	return service;
 });

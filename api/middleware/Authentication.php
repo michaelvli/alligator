@@ -33,7 +33,21 @@
 				$token = new Token();
 				if ($token->authenticateToken($AuthToken)) // call next middleware or the next route callback
 				{
-					
+					//Send response to refresh token if token has within 60 minutes of expiration
+//					$date = new DateTime();
+//					$currentTime = $date->getTimestamp();
+//					$tokenExpiration = $token->getTokenClaim("exp");
+//					$difference = ($currentTime - $tokenExpiration) / 60; // in minutes
+//					if ( $difference <= 60 )
+//					{
+						// store the route
+						// send user to log_in page
+						// after user logs in, take them to the stored route
+//						$status = 401;
+//						$response["tokenRefresh"] = true;
+//						sendResponse($status, $response);
+//					}	
+				
 					// use SLIM's environment object to store userID
 					$env = $app->environment();
 					$env["userID"] = $token->getTokenClaim("user_id");
@@ -46,7 +60,7 @@
 					// send user to log_in page
 					// after user logs in, take them to the stored route
 					$status = 401;
-					$response["WTF"] = $app->request()->getPathInfo();		 
+//					$response["WTF"] = $app->request()->getPathInfo();
 					$response["message"] = "Please log in first";
 					sendResponse($status, $response);
 				}	

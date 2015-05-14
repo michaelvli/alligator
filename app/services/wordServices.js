@@ -12,11 +12,11 @@
 "use strict"; // all variables must be declared
 
 // "services" is declared in sessionServices.js
-services.factory("wordServices", function($http, urls){
+services.factory("wordServices", function($http, urls, $localStorage, $sessionStorage){
 	
 	var service = {}; // declaration of object that will be returned to calling controller
 	var wordsArray = []; // stores an array of words with each word containing object elements (the elements are actually the individual columns of the "Words" db table)
-	var currentWordIndex;
+	var currentWordIndex = ""; // stores the index value of the "current" word in wordsArray[].
 	
 	/* public methods via the service object below: */
 	
@@ -48,41 +48,67 @@ services.factory("wordServices", function($http, urls){
 	}
 	
 	// methods for manipulating wordObject
-
-	var getCurrentWordIndex = function(wordsArr){
-		
-		var index;
-		var i = 0;
-			
-		while (index === undefined)
-		{
-			if (wordsArr[i].currentWord == true)
-			{
-				index = i;
-			}        
-			i = i + 1;
-		}
-		return index;
-	}
 		
 	service.getCurrentWord = function(){
+		
+		if (wordsArray == "" )
+		{
+			wordsArray = $localStorage.wordsArray;
+		}
+		if (currentWordIndex == "")
+		{
+			currentWordIndex = $localStorage.currentWordIndex;
+		}
 		return wordsArray[currentWordIndex]; // returns an object
 	};
 	
 	service.getPreviousWord = function(index){		
-		var previousWordsArray = wordsArray; // make a copy of array containins all words
+		var previousWordsArray = wordsArray; // make a copy of array containing all words
 		previousWordsArray.splice(currentWordIndex, 1); // remove current word, resulting in previous words only
 		return previousWordsArray; // returns an array with elements of the object type
 	}
+
+	service.storeWords = function(){
+		$localStorage.wordsArray = wordsArray;
+	};
+
+	service.storeCurrentWordIndex = function(){
+		$localStorage.currentWordIndex = currentWordIndex;
+	};
 	
-	service.setArr = function(wordsArr){
+	service.setWords = function(wordsArr, index){
+		// store array of words
 		wordsArray = wordsArr;
-		currentWordIndex = getCurrentWordIndex(wordsArr);
+		service.storeWords();
+		
+		// store array index for current word
+		// getCurrentWordIndex returns a promise
+		currentWordIndex = index;
+		service.storeCurrentWordIndex();
 	};
-
-	service.resetArr = function(){
+	
+	service.resetWords = function(){
+		// reset array of words
 		wordsArray = [];
+		service.storeWords();
+
+		// reset array index for current word
+		currentWordIndex = "";
+		service.storeCurrentWordIndex();
 	};
 
+	service.getWordCount = function(){
+		// if localStorage doesn't have array of words, then this user isn't associated with any words.
+		if ((wordsArray == "" || wordsArray == undefined) && $localStorage.wordsArray == undefined)
+		{
+			return 0;
+		}
+		else if (wordsArray == "" || wordsArray == undefined)
+		{
+			wordsArray = $localStorage.wordsArray;
+		}
+		return wordsArray.length;
+	};
+	
 	return service;
 });

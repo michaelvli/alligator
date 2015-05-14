@@ -25,6 +25,7 @@
 	
 	<!-- Controllers -->
 	<script src="app/controllers/sessionController.js"></script>
+	<script src="app/controllers/navigationController.js"></script>
 	<script src="app/controllers/userController.js"></script>
 	<script src="app/controllers/wordController.js"></script>
 	
@@ -33,13 +34,14 @@
 	<script src="app/services/userServices.js"></script>
 	<script src="app/services/wordServices.js"></script>
 	<script src="app/services/authorizationInterceptor.js"></script>
+	<script src="app/services/refreshTokenInterceptor.js"></script>
 	
 	<!-- required to use "pretty urls" for AngularJS -->
 	<base href="/" />
 	
 </head>
 <body>
-	<nav class="navbar navbar-default navbar-fixed-top" data-ng-show="token">
+	<nav class="navbar navbar-default navbar-fixed-top" ng-controller="NavigationController" ng-show="checkSession()">
 		<div class="container">
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -55,6 +57,7 @@
 					<li class="active"><a href="#">Home</a></li>
 					<li><a href="#about">About</a></li>
 					<li><a href="#contact">Contact</a></li>
+					<li><a href="" ng-click="logout()">Log out</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right" ng-controller="UserController">
 					<li><a href="#">[AVATAR] </a></li>

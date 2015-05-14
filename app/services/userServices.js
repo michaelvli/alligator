@@ -12,7 +12,7 @@
 "use strict"; // all variables must be declared
 
 // "services" is declared in sessionServices.js
-services.factory("userServices", function($http, urls){
+services.factory("userServices", function($http, urls, $localStorage, $sessionStorage){
 	
 	var service = {}; // declaration of object that will be returned to calling controller
 	var userObject = {}; // declaration of object that stores user information
@@ -35,13 +35,29 @@ services.factory("userServices", function($http, urls){
 	};
 	
 	// manipulating userObject
-	service.getObj = function(){
+	service.getUser = function(){
+		if (service.isEmpty){
+			userObject = $localStorage.userObject;
+		}
 		return userObject;
 	};
-	
-	service.setObj = function(userObj){
-		userObject = userObj;
+
+	service.storeUser = function(){
+		$localStorage.userObject = userObject;
 	};
-		
+	
+	service.setUser = function(userObj){
+		userObject = userObj;
+		service.storeUser();
+	};
+	
+	service.isEmpty = function(){
+		for(var prop in userObj) {
+			if(userObj.hasOwnProperty(prop))
+				return false;
+		}
+		return true;
+	};
+	
 	return service;
 });

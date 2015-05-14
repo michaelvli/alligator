@@ -25,6 +25,8 @@ function createWord(){
 		$status = 200;
 		$response["message"] = "New word saved";
 		$response["words"] = $wordsArray;
+		$currentWordIndex = $word->getCurrentWordIndex();
+		$response["currentWordIndex"] = $currentWordIndex;
 	}
 	else
 	{

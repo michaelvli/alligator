@@ -3,7 +3,7 @@
 /* Controllers */
 
 // "controllers" is declared in sessionController.js
-controllers.controller("UserController", function ($rootScope, $scope, $location, userServices, wordServices, $localStorage, $sessionStorage){	
+controllers.controller("UserController", function ($scope, $location, sessionServices, userServices, wordServices){	
 	
 	$scope.user = {};
 	
@@ -18,15 +18,15 @@ controllers.controller("UserController", function ($rootScope, $scope, $location
 		};
 		
 		var successCallback = function(data, status, headers, config){
+			
 			// store token in session
-			$sessionStorage.token = data.token;
-		    $rootScope.token = $sessionStorage.token; // presence of non-null token in $rootScope triggers navigation pane			
+			sessionServices.setToken(data.token);
 
 			// store user data into userServices
-			userServices.setObj(data.user);			
+			userServices.setUser(data.user);			
 			
 			// reset words
-			wordServices.resetArr();
+			wordServices.resetWords();
 			
 			// success message
 			$scope.message = data;

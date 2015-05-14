@@ -2,29 +2,24 @@
 
 /* Controllers */
 // "controllers" is declared in sessionController.js
-controllers.controller('WordController', function ($scope, $location, userServices, wordServices, urls) {
-	
+controllers.controller('WordController', function ($scope, $location, userServices, wordServices, urls ) {
+
 	$scope.user = {
-		firstName: userServices.getObj().firstName,
-		lastName: userServices.getObj().lastName,
-		city: userServices.getObj().city,
-		state: userServices.getObj().state
+		firstName: userServices.getUser().firstName,
+		lastName: userServices.getUser().lastName,
+		city: userServices.getUser().city,
+		state: userServices.getUser().state
 	}
 
-	// need to check if wordArray is empty
-	if (wordServices.getCurrentWord() !== undefined)
-	{
+	if (wordServices.getWordCount() > 0)
+	{	
 		$scope.word = {
 			word: wordServices.getCurrentWord().word,
 			story: wordServices.getCurrentWord().story,
 			dateCreated: wordServices.getCurrentWord().dateCreated
 		}
 	}
-	else
-	{
-		$scope.word = {};
-	}
-
+	
 	$scope.createWord = function(){
 		var dataObj = {
 			word: $scope.word.word,
@@ -34,9 +29,10 @@ controllers.controller('WordController', function ($scope, $location, userServic
 		var successCallback = function(data, status, headers, config){
 			console.log(data.message);
 			
-			// store word data into wordServices
-			wordServices.setArr(data.words);
-			
+			// store words and array index of current word into wordServices
+			wordServices.setWords(data.words, data.currentWordIndex);
+
+			// take user to "show words" page
 			$location.path("/show_words"); // http://stackoverflow.com/questions/14201753/angular-js-how-when-t
 		};
 		
@@ -59,10 +55,7 @@ controllers.controller('WordController', function ($scope, $location, userServic
 		var errorCallback = function(data, status, headers, config){
 			// friendly-forwarding
 			if (status === 401) // unauthorized
-			{
-				// store for friendly forwarding
-				// $sessionStorage.friendlyRedirect = $location.url();
-				
+			{	
 				// take user to the current word page
 				$location.path("/log_in"); // http://stackoverflow.com/questions/14201753/angular-js-how-when-t		
 				console.log(data.message);

@@ -14,9 +14,9 @@ class dbHandler{
 		$this->db = new dbConnection();
 //		$this->magentoDB = new dbConnection();
 	}
-
+/*
 	// For building dynamic queries, see - http://patrickallaert.blogspot.com/2007/09/building-dynamic-sql-queries-elegant.html
-	public function selectQuery($table, $email){
+	public function selectQuery($table, $email, $id){
 //		$sql = "SELECT id, passwordHash, email, firstName, lastName, birthday FROM users WHERE email = :email";
 		switch($table)
 		{
@@ -68,8 +68,8 @@ class dbHandler{
 		}
 		
 	}
+*/	
 	
-/*	
 	public function select_Users_email($email)
 	{	
 		// for more info on using prepared statements, see http://stackoverflow.com/questions/767026/how-can-i-properly-use-a-pdo-object-for-a-select-query
@@ -97,7 +97,36 @@ class dbHandler{
 			echo "Failed query: user.checkEmail() ";
 		}	
 	}
-*/	
+	
+	public function select_Words_userid($user_id)
+	{	
+		// for more info on using prepared statements, see http://stackoverflow.com/questions/767026/how-can-i-properly-use-a-pdo-object-for-a-select-query
+		$sql = "SELECT * FROM words WHERE user_id = :user_id";
+		$sql = $this->db->prepare($sql);
+		$sql->bindParam(":user_id", $user_id);
+		if ($sql->execute()) // execute() returns true on success and false on failure
+		{
+			if ($sql->rowcount() > 0)
+			{
+				$rows_array = $sql->fetchAll(PDO::FETCH_ASSOC); // returns an associative array				
+//				echo json_encode($rowsArray, JSON_PRETTY_PRINT); // http://www.dyn-web.com/tutorials/php-js
+				if ($rows_array === false)
+				{
+					return null;	
+				}
+				return $rows_array; // returns a db rows as an associative array
+			}
+			else
+			{
+				return null;
+			}
+		}
+		else
+		{
+			echo "Failed query: select_Words_userid() ";
+		}	
+	}
+	
 	public function update_Users_password($id, $password)
 	{
 		// for more info on using prepared statements, see http://stackoverflow.com/questions/767026/how-can-i-properly-use-a-pdo-object-for-a-select-query
@@ -163,7 +192,7 @@ class dbHandler{
 		}
 		else
 		{
-			echo "Failed query: user.checkEmail() ";
+			echo "Failed query: getCurrentWord ";
 		}	
 	}
 	

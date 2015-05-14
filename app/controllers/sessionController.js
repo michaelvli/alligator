@@ -4,7 +4,7 @@
 
 var controllers = angular.module("controllers", []);
 	
-controllers.controller("SessionController", function ($rootScope, $scope, $location, sessionServices, userServices, wordServices, $localStorage, $sessionStorage){
+controllers.controller("SessionController", function ($scope, $location, sessionServices, userServices, wordServices){
 	
 	$scope.user = {};
 	
@@ -18,15 +18,15 @@ controllers.controller("SessionController", function ($rootScope, $scope, $locat
 		
 		var successCallback = function(data, status, headers, config){
 			// store token in session
-			$sessionStorage.token = data.token;
-		    $rootScope.token = $sessionStorage.token; // presence of non-null token in $rootScope triggers navigation pane
+			sessionServices.setToken(data.token);
+
 //			console.log(data.user); // data.user is an object
 //			console.log(data.words); // data.words is an array with elements of the object type
 //			console.log ("current Word is: " + data.words[0].word);
 
 			// store user data into userServices
-			userServices.setObj(data.user);
-		
+			userServices.setUser(data.user);
+
 			// if user doesn't have a word, then need to create a word
 			if(typeof(data.words) === "undefined") // data.words is an array with elements of object type
 			{	
@@ -35,8 +35,8 @@ controllers.controller("SessionController", function ($rootScope, $scope, $locat
 			else // user has at least one word
 			{
 				// store word data into wordServices
-				wordServices.setArr(data.words);
-
+				wordServices.setWords(data.words, data.currentWordIndex);
+				
 				// take user to the words page
 				$location.path("/show_words"); // http://stackoverflow.com/questions/14201753/angular-js-how-when-t				
 			}
@@ -48,10 +48,5 @@ controllers.controller("SessionController", function ($rootScope, $scope, $locat
 		};
 		
 		sessionServices.login(dataObj, successCallback, errorCallback);
-	}
-	
-	$scope.log_out = function(){
-		
-	};
-	
+	}	
 });

@@ -38,7 +38,9 @@ function loginUser(){
 		// only send $wordsArray in the response if at least 1 word was returned
 		if($wordsArray)
 		{
-			$response["words"] = $wordsArray;	
+			$response["words"] = $wordsArray;
+			$currentWordIndex = $word->getCurrentWordIndex();
+			$response["currentWordIndex"] = $currentWordIndex;
 		}
 
 	}

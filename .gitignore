@@ -2,3 +2,6 @@
 /vendor/
 /api/SQL/
 /api/config/
+/node_modules/
+/test
+karma.conf.js

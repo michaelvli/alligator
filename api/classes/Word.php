@@ -9,10 +9,8 @@ class Word {
 	private $story;
 //	private $dateCreated;
 	private $currentWord;
-	private $wordArray = array();
-		
-protected $db;	
-	
+	private $wordsArray = array();
+			
 	public function __construct($word="", $story=""){
 		$this->word = $word;
 		$this->story = $story;
@@ -31,53 +29,25 @@ protected $db;
 	}
 	
 	public function getWords($user_id){
-		// for more info on using prepared statements, see http://stackoverflow.com/questions/767026/how-can-i-properly-use-a-pdo-object-for-a-select-query
-		$sql = "SELECT id, user_id, word, story, dateCreated, currentWord FROM words WHERE user_id = :user_id";
-		$sql = $this->db->prepare($sql);
-		$sql->bindParam(':user_id', $user_id);
-		if ($sql->execute()) // execute() returns true on success and false on failure
-		{
-			if ($sql->rowcount() > 0)
-			{
-				$result = $sql->fetchAll(PDO::FETCH_ASSOC); // returns an associative array				
-//				echo json_encode($result, JSON_PRETTY_PRINT); // http://www.dyn-web.com/tutorials/php-js/json/multidim-arrays.php
-				return $result;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else
-		{
-			echo "Failed query: word.getCurrentWord() ";
-		}
+		$db = new dbHandler();
+		$rows_array = $db->select_Words_userid($user_id);
+//		$row_obj = $db->selectQuery("words", "", $user_id); // dynamic select statement
+		$this->wordsArray = $rows_array;
+		return $rows_array;
 	}
-/*	
-	public function getCurrentWord($user_id){
-		// for more info on using prepared statements, see http://stackoverflow.com/questions/767026/how-can-i-properly-use-a-pdo-object-for-a-select-query
-		$sql = "SELECT id, user_id, word, story, dateCreated, currentWord FROM words WHERE currentWord = true AND user_id = :user_id";
-		$sql = $this->db->prepare($sql);
-		$sql->bindParam(':user_id', $user_id);
-		if ($sql->execute()) // execute() returns true on success and false on failure
+	
+	public function getCurrentWordIndex(){
+		$index = "";
+		$i = 0;
+		
+		while ($index === "") 
 		{
-			if ($sql->rowcount() > 0)
+			if ($this->wordsArray[$i]["currentWord"] == true)
 			{
-				$result = $sql->fetch(PDO::FETCH_OBJ);
-				$this->word = $result->word;
-				$this->story = $result->story;
-				$this->dateCreated = $result->dateCreated;
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+				$index = $i;
+			}        
+			$i = $i + 1;
 		}
-		else
-		{
-			echo "Failed query: word.getCurrentWord() ";
-		}
+		return $index;
 	}
-*/
 }
