@@ -1,6 +1,7 @@
 <?php
 
 function createWord(){
+		
 	// use SLIM's environment object to retrieve userID
 	$app = \Slim\Slim::getInstance();
 	$env = $app->environment();
@@ -16,26 +17,23 @@ function createWord(){
 	
 	if ($wordID)
 	{
-// 		echo "created new word";
-		// get all words
-		$word = new Word();
-		$wordsArray = $word->getWords($userID);
-
+		// set flag to include words in proper API response (see Response.php)
+		$env["createWordsFlag"] = true; // Response object will send user's words
+		
 		// generate success response
 		$status = 200;
-		$response["message"] = "New word saved";
-		$response["words"] = $wordsArray;
-		$currentWordIndex = $word->getCurrentWordIndex();
-		$response["currentWordIndex"] = $currentWordIndex;
+		$message = "New word saved";
 	}
 	else
 	{
-// echo "Oh crap";		
 		// generate error response
 		$status = 500;
-		$response["message"] = "Please try again";				
+		$message = "Please try again";				
 	}
-	sendResponse($status, $response);
+	
+	// send response
+	$response = new Response();
+	$response->send($status, $message);
 }
 
 

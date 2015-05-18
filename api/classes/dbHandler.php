@@ -98,6 +98,34 @@ class dbHandler{
 		}	
 	}
 	
+	public function select_Users_id($id)
+	{	
+		// for more info on using prepared statements, see http://stackoverflow.com/questions/767026/how-can-i-properly-use-a-pdo-object-for-a-select-query
+		$sql = "SELECT * FROM users WHERE id = :id";
+		$sql = $this->db->prepare($sql);
+		$sql->bindParam(":id", $id);
+		if ($sql->execute()) // execute() returns true on success and false on failure
+		{
+			if ($sql->rowcount() > 0)
+			{
+				$row = $sql->fetch(PDO::FETCH_OBJ); // returns false on failure
+				if ($row === false)
+				{
+					return null;	
+				}
+				return $row; // returns a db row as an object
+			}
+			else
+			{
+				return null;
+			}
+		}
+		else
+		{
+			echo "Failed query: user.checkEmail() ";
+		}	
+	}
+	
 	public function select_Words_userid($user_id)
 	{	
 		// for more info on using prepared statements, see http://stackoverflow.com/questions/767026/how-can-i-properly-use-a-pdo-object-for-a-select-query

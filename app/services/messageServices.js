@@ -12,30 +12,28 @@
 "use strict"; // all variables must be declared
 
 // "services" is declared in sessionServices.js
-services.factory("userServices", function($localStorage, $sessionStorage){
+services.factory("messageServices", function($rootScope){
 	
 	var service = {}; // declaration of object that will be returned to calling controller
+	var queue = [];
+	var currentMessage = "";
 	
-	/* public methods via the service object below: */
+	$rootScope.$on('$routeChangeSuccess', function (event, next, current) {
+		currentMessage = queue.shift() || "";
+	});
 	
-	// manipulating userObject
-	service.getUser = function(){
-		return $localStorage.userObject;
+	service.getMessage = function(){
+		return currentMessage;
+	};	
+
+	// if page doesn't change, user may still need to see a message (e.g. failure to log in)
+	service.getMessageNow = function(){
+		currentMessage = queue.shift() || "";
+	};	
+	
+	service.setMessage = function(message){
+		queue.push(message);
 	};
-	
-	service.setUser = function(userObj){
-		$localStorage.userObject = userObj;
-		
-		return true;
-	};
-	
-	service.isEmpty = function(){
-		for(var prop in $localStorage.userObject) {
-			if($localStorage.userObject.hasOwnProperty(prop))
-				return false;
-		}
-		return true;
-	};
-	
+
 	return service;
 });

@@ -25,23 +25,31 @@
 	
 	<!-- Controllers -->
 	<script src="app/controllers/sessionController.js"></script>
-	<script src="app/controllers/navigationController.js"></script>
+	<script src="app/controllers/mainController.js"></script>
 	<script src="app/controllers/userController.js"></script>
 	<script src="app/controllers/wordController.js"></script>
 	
 	<!-- Services-->
 	<script src="app/services/sessionServices.js"></script>
+	<script src="app/services/sessionAPIServices.js"></script>
 	<script src="app/services/userServices.js"></script>
+	<script src="app/services/userAPIServices.js"></script>
 	<script src="app/services/wordServices.js"></script>
-	<script src="app/services/authorizationInterceptor.js"></script>
-	<script src="app/services/refreshTokenInterceptor.js"></script>
+	<script src="app/services/wordAPIServices.js"></script>	
+	<script src="app/services/messageServices.js"></script>
 	
+	<!-- Interceptors -->
+	<script src="https://cdn.rawgit.com/auth0/angular-jwt/master/dist/angular-jwt.js"></script>
+	<script src="app/services/responseInterceptor.js"></script>
+	<script src="app/services/responseErrorInterceptor.js"></script>
+	<script src="app/services/tokenInterceptor.js"></script>
+
 	<!-- required to use "pretty urls" for AngularJS -->
 	<base href="/" />
 	
 </head>
-<body>
-	<nav class="navbar navbar-default navbar-fixed-top" ng-controller="NavigationController" ng-show="checkSession()">
+<body ng-controller="MainController" ng-hide="refreshingToken()">
+	<nav class="navbar navbar-default navbar-fixed-top" ng-show="checkSession()">
 		<div class="container">
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -67,7 +75,12 @@
 			</div><!--/.nav-collapse -->
 		</div>
     </nav>
-
+	
+	<!-- status message -->	
+	<div class="alert" ng-show="getMessage()">
+		<p ng-bind="getMessage()"></p>
+	</div>
+	
 	<!-- injection point for angular views -->
 	<div id="view" ng-view>
 		(THIS SHOULD BE OVERWRITTEN BY A TEMPLATE OR PARTIAL)

@@ -7,7 +7,8 @@ var myIntentProject = angular.module("myIntentProject", [
   "angular-loading-bar", // http://chieffancypants.github.io/angular-loading-bar/
   "ngStorage", // https://github.com/gsklee/ngStorage
   "services",
-  "controllers"
+  "controllers",
+  "angular-jwt"
 ]);
 
 
@@ -19,8 +20,8 @@ myIntentProject.constant("urls", {
 });
  
 // ROUTES
-myIntentProject.config(["$routeProvider", "$httpProvider", "$locationProvider", "urls",
-	function($routeProvider, $httpProvider, $locationProvider, urls) {
+myIntentProject.config(["$routeProvider", "$httpProvider", "$locationProvider", "urls", "jwtInterceptorProvider",
+	function($routeProvider, $httpProvider, $locationProvider, urls, jwtInterceptorProvider) {
 		$routeProvider.
 			when("/", { // path is relative to "localhost/projects/myIntent/public/"
 				templateUrl: urls.BASE_APP + "templates/show_words.html",
@@ -47,51 +48,82 @@ myIntentProject.config(["$routeProvider", "$httpProvider", "$locationProvider", 
 			otherwise({ 
 				redirectTo: '/' 
 			});
-		// $httpProvider is an Array containing service factories for all synchronous or asynchronous 
-		// $http pre-processing of request or postprocessing of responses.
-		// authorizationInterceptor is an interceptor that is added to the $httpProvider.interceptors array.		
-//		$httpProvider.interceptors.push("routeInterceptor"); // see app/services
-		$httpProvider.interceptors.push("authorizationInterceptor"); // see app/services
-//		$httpProvider.interceptors.push("refreshTokenInterceptor"); // see app/services
+		// Interceptors
+		$httpProvider.interceptors.push("responseInterceptor"); // responseError interceptor
+		$httpProvider.interceptors.push("responseErrorInterceptor"); // responseError interceptor
+		$httpProvider.interceptors.push("tokenInterceptor"); // response interceptor
+		
+		// request interceptor from Oath
+		jwtInterceptorProvider.tokenGetter = ["config", "sessionServices", function(config, sessionServices) {
+
+			// Skip authentication for any requests ending in .html
+			if (config.url.substr(config.url.length - 5) == ".html") 
+			{
+			  return null;
+			}
+			
+		    return sessionServices.getToken();
+		}];
+		$httpProvider.interceptors.push('jwtInterceptor'); // request interceptor
+		
 		// use the HTML5 History API
         $locationProvider.html5Mode(true);
 	}
 ]);
 
+// Need to address the following routing scenarios:
+// 1) User is not logged in and wants to access restricted content
+// 2) User is logged in but hasn't created a word before
+// 3) User is logged in and wants to access "Sign up" and "Log in" pages
+myIntentProject.run(function($rootScope, $location, sessionServices, sessionAPIServices, wordServices){
 
-myIntentProject.run(function($rootScope, $location, sessionServices, wordServices){
+	// Check type of content user is trying to access
+	var publicRoutes = ["/log_in", "/sign_up"]; // all public content
+	var basicRoutes = ["/log_in", "/sign_up"]; // "log in" and "sign up" pages only
+	var showWordsRoutes = ["/", "/show_words"] // "show words" page
 
-	// urls listed in the publicRoutes array indicate pages that do not require user to be logged in
-	var publicRoutes = ["/log_in", "/sign_up"]; // "log in" and "sign up" pages
+	$rootScope.$on('$locationChangeStart', function(event, next, current){
+
+		// get a refresh token if logged in user is opening up application directly via url (vs. clicking to it)
+		if (sessionServices.loggedIn() && current == next) // current == undefined when directly accessing page via url
+		{			
+			// hide page while refreshing token
+			sessionServices.setRefreshingToken(true);
+			
+			// send token refresh request to API
+			sessionAPIServices.refreshToken();
+		}	
+	});	
 	
 	$rootScope.$on('$routeChangeStart', function (event, next, current) {
 //	To figure out the properties and values of the "next" object:
 //		for(var propertyName in next) {
-//		console.log("property: " + propertyName + " : " + next[propertyName]);   
+//			console.log("next property: " + propertyName + " : " + next[propertyName]);   
 //		}
-
-		// Make sure that user is logged in to access pages requiring authorization
-		if (publicRoutes.indexOf(next.originalPath)== -1) // paths requiring authorization
-		{
-			// if user is not logged on, direct him to "log in" page
-			if(!sessionServices.loggedIn())
+		
+		// Scenario 1: if user is accessing restricted content, user needs to be logged in
+		if (publicRoutes.indexOf(next.originalPath) == -1 && !sessionServices.loggedIn()) // restricted content
+		{	
+			if(!sessionServices.loggedIn()) // user not logged in
 			{
-				$location.path('/log_in'); // redirect back to log in
+				$location.path("/log_in"); // direct user to "log in" page
 			}
 		}
 
-		// if user is logged on, then prevent him from going back to "log in" or "sign up" pages
-		if(sessionServices.loggedIn()) // user is logged in
+		// Scenario 2: if request "show words" page, check logged in user has at least one word
+		if(showWordsRoutes.indexOf(next.originalPath) >= 0 && sessionServices.loggedIn())
 		{
-			if (wordServices.getWordCount() > 0)
+			if (wordServices.getWordCount() == 0) // user doesn't have a word
 			{
-				$location.path("/show_words");
+				$location.path("/create_word"); // direct user to "create word" page
 			}
-			else
-			{
-				$location.path("/create_word");
-			}
-		}		
+		}
+
+		// Scenario 3: if user is logged on, then prevent him from going back to "log in" or "sign up" pages
+		if(basicRoutes.indexOf(next.originalPath) == 0 && sessionServices.loggedIn())
+		{
+			event.preventDefault();
+		}
 
 	});
  

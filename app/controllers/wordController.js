@@ -2,7 +2,7 @@
 
 /* Controllers */
 // "controllers" is declared in sessionController.js
-controllers.controller('WordController', function ($scope, $location, userServices, wordServices, urls ) {
+controllers.controller('WordController', function ($scope, $location, wordServices, wordAPIServices, userServices) {
 
 	$scope.user = {
 		firstName: userServices.getUser().firstName,
@@ -40,7 +40,7 @@ controllers.controller('WordController', function ($scope, $location, userServic
 			console.log(data.message);
 		};
 		
-		wordServices.createWord(dataObj, successCallback, errorCallback);
+		wordAPIServices.createWord(dataObj, successCallback, errorCallback);
 	}
 	
 	$scope.showWords = function(){
@@ -62,7 +62,7 @@ controllers.controller('WordController', function ($scope, $location, userServic
 			}	
 		};
 		
-		wordServices.showWords(successCallback, errorCallback);
+		wordAPIServices.showWords(successCallback, errorCallback);
 	}
 	
 //	$http.get('../myIntent/api/words').success(function(data) {

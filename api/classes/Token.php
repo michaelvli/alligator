@@ -55,6 +55,13 @@ class Token {
 
 	public function authenticateToken($token){
 
+		// angular-jwt passes json web token via the "Authorization" header in the following format:
+		//
+		//		"Bearer tokenheader.tokenpayload.tokensignature"
+		//
+		// Thus, need to strip out "bearer "
+		$token = str_replace("Bearer ", "", $token);
+		
 		// $key is passed into decode() method for authentication purposes.
 		// if decoded JWT doesn't match $key, an exception is produced
 		try

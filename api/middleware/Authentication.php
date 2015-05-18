@@ -19,8 +19,6 @@
 //			$publicRoutes = ["/","/myintent/api/log_in","/sign_up"];
 			$publicRoutes = ["/","/log_in","/sign_up"];
 
-//			echo $app->request()->getPathInfo();
-
 			// if route is accessible without an access token, skip authentication process
 			if (in_array($app->request()->getPathInfo(), $publicRoutes))
 			{
@@ -28,41 +26,46 @@
 			}
 			else // need to authenticate
 			{
-				$AuthToken = $app->request->headers->get("AuthToken");
-				
+				// angular-jwt passes json web token via the "Authorization" header in the following format:
+				//
+				//		"Bearer tokenheader.tokenpayload.tokensignature"
+				//
+				// Typically, the format of the "Authorization" header is "Basic <some string>" or 
+				// "Digest <some string>".  Thus, SLIM cannot parse the "Authorization" header since it doesn't
+				// follow the standard format without adding the following line to either the "httpd.conf" (which 
+				// is what I modified for this project) or ".htaccess" file:
+				//
+				// 		SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+				//
+				// For more info: http://stackoverflow.com/questions/26256730/slimframework-request-headers-don%C2%B4t-read-authorization/26285310#26285310
+				$BearerToken = $app->request->headers->get("Authorization");
+
 				$token = new Token();
-				if ($token->authenticateToken($AuthToken)) // call next middleware or the next route callback
+				if ($token->authenticateToken($BearerToken)) // call next middleware or the next route callback
 				{
-					//Send response to refresh token if token has within 60 minutes of expiration
-//					$date = new DateTime();
-//					$currentTime = $date->getTimestamp();
-//					$tokenExpiration = $token->getTokenClaim("exp");
-//					$difference = ($currentTime - $tokenExpiration) / 60; // in minutes
-//					if ( $difference <= 60 )
-//					{
-						// store the route
-						// send user to log_in page
-						// after user logs in, take them to the stored route
-//						$status = 401;
-//						$response["tokenRefresh"] = true;
-//						sendResponse($status, $response);
-//					}	
-				
 					// use SLIM's environment object to store userID
 					$env = $app->environment();
 					$env["userID"] = $token->getTokenClaim("user_id");
 
+					// if validated token (i.e. not expired) is one or more hours old, then refresh token
+					$issued_at = $token->getTokenClaim("iat"); // time (in unix) issued
+					$date = new DateTime();
+					$currentTime = $date->getTimestamp(); // current time (in unix)
+					$difference = ($currentTime - $issued_at); // in seconds
+					if ($difference >= 60*60) // if token is more than 1 hour old, then create a new token
+					{
+						// use SLIM's environment object to set createToken flag (used in sendResponse.php)
+						$env["createTokenFlag"] = true;
+					}	
+										
 					$this->next->call(); // call next middleware or the callback
 				}
 				else // friendly forward
 				{
-					// store the route
-					// send user to log_in page
-					// after user logs in, take them to the stored route
 					$status = 401;
-//					$response["WTF"] = $app->request()->getPathInfo();
-					$response["message"] = "Please log in first";
-					sendResponse($status, $response);
+					$message = "Please log in first";
+					$response = new Response();
+					$response->send($status, $message);
 				}	
 			}			
 		};

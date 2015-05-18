@@ -17,46 +17,47 @@ function loginUser(){
 	// check if user email and password match
 	if ($user->authenticateEmailPassword()) // if email and password matches, then
 	{	
-		// get userID and role
+		// get userID
 		$userID = $user->getID();
-		
-		// create token
-		$token = new Token();
-		$token->createToken($userID);
-		$encoded_token = $token->getToken();		
-		
-		// get all words
-		$word = new Word();
-		$wordsArray = $word->getWords($userID);
-				
+
+		// use SLIM's environment object to set store user id and flags to
+		// send proper API response (see Response.php)
+		$env = $app->environment();
+		$env["userID"] = $userID;
+		$env["createTokenFlag"] = true; // Response object will send token
+		$env["createUserFlag"] = true; // Response object will send user info
+		$env["createWordsFlag"] = true; // Response object will send user's words, if any
+						
 		// generate success response
 		$status = 200;
-		$response["message"] = "Welcome back!";
-		$response["token"] = $encoded_token;
-		$response["user"] = $user->makeUserObj();
-		
-		// only send $wordsArray in the response if at least 1 word was returned
-		if($wordsArray)
-		{
-			$response["words"] = $wordsArray;
-			$currentWordIndex = $word->getCurrentWordIndex();
-			$response["currentWordIndex"] = $currentWordIndex;
-		}
-
+		$message = "Welcome back!";
 	}
 	else
 	{
 		// generate error response
 		$status = 401;
-		$response["message"] = "Email and password are not valid";
+		$message = "Please log in first";
 	}
 
-	sendResponse($status, $response);
+	// send response
+	$response = new Response();
+	$response->send($status, $message);
 }
 
 
-function logoutUser(){
-	echo "logged out!";
+function refreshToken(){
+	// use SLIM's environment object to set store user id and flags to
+	// send proper API response (see Response.php)
+	$app = \Slim\Slim::getInstance();
+	$env = $app->environment();
+	$env["createTokenFlag"] = true; // Response object will send token
+					
+	// generate success response
+	$status = 200;
+	
+	// send response
+	$response = new Response();
+	$response->send($status);
 }
 
 ?>

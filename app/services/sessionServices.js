@@ -13,48 +13,46 @@
 
 var services = angular.module("services", []);
 
-services.factory("sessionServices", function($http, urls, $localStorage, $sessionStorage){
+services.factory("sessionServices", function($localStorage, $sessionStorage, $location, userServices, wordServices){
 	
 	var service = {}; // declaration of object that will be returned to calling controller
-	var token;
+	var refreshingToken = false;
 	
 	/* public methods via the service object below: */
-		
-	// existing user log in
-	service.login = function(dataObj, successResponse, errorResponse){
-		
-		// create object to capture arguments for the $http request
-		var request = {
-			method: 'POST',
-			url: urls.BASE_API + "/log_in",
-			params: dataObj // passing "params" (vs. "data") - means API will need to use SLIM's $app->request()->params("email") (vs. $app->request()->getBody()->email followed by json_decode($request)->email)
-		}
-		
-		var loginRequest = $http(request).success(successResponse).error(errorResponse);
-		
-		return loginRequest;
+	
+	service.logout = function(){
+		service.setToken(""); // erase token
+		userServices.setUser(""); // erase user info
+		wordServices.resetWords(); // erase words
+		$location.path("/log_in"); // direct user to "log in" page
 	};
 	
 	service.setToken = function(tokenValue){
-		token = tokenValue;
 		$localStorage.token = tokenValue;
+		return true;
 	};	
 
 	service.getToken = function(){
-		if (token == "" || token == undefined)
-		{
-			token = $localStorage.token;
-		}	
-		return token;
+		return $localStorage.token;
+	};
+		
+	// used in MainController to show/hide <body> in index.html
+	service.setRefreshingToken = function(ready) {
+		refreshingToken = ready;
 	};
 
+	// used in MainController to show/hide <body> in index.html
+	service.getRefreshingToken = function() {
+		return refreshingToken;
+	};
+	
 	service.loggedIn = function(){
 		if (service.getToken() == undefined || service.getToken() == "")
 		{
 			return false;
 		}
 		return true;
-	};
-		
+	};	
+
 	return service;
 });

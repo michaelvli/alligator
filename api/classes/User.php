@@ -97,6 +97,13 @@ class User {
 		return $row_obj;
 	}
 
+	public function fillByID(){
+		$db = new dbHandler();
+		$row_obj = $db->select_Users_id($this->id);
+		$this->loadDbRow($row_obj);
+		return true;
+	}
+	
 	// check to see if hash and password match
 	public function authenticateEmailPassword(){
 		$row_obj = $this->checkEmail();

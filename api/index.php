@@ -65,6 +65,7 @@ require 'classes/Token.php';
 require 'classes/Session.php';
 require 'classes/User.php';
 require 'classes/Word.php';
+require 'classes/Response.php';
 
 /**
   * Middleware
@@ -72,11 +73,6 @@ require 'classes/Word.php';
 require 'middleware/Authentication.php'; // loading Middleware class
 
 $app->add(new \authentication()); // Adding Middleware instance to SLIM application
-
-/**
- * 	Load Helpers
- */
-require "helpers/sendResponse.php";
 
 /**
  *	Defining routes
@@ -92,7 +88,7 @@ require "routes/wordCallbacks.php";
 
 	// Routes - Sessions
 	$app->post("/log_in", "loginUser");
-	$app->get("/log_out","logoutUser");
+	$app->post("/refresh_token", "refreshToken");
 
 	// Routes - User
 	$app->post("/sign_up", "createUser");

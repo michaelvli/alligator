@@ -26,7 +26,7 @@ function createUser() {
 // echo "Email is taken";			
 			// generate error response
 			$status = 409;
-			$response["message"] = "Email is already in use";
+			$message = "Email is already in use";
 		}
 		else
 		{
@@ -34,26 +34,28 @@ function createUser() {
 
 			if ($userID)
 			{
-				// create token
-				$token = new Token();
-				$token->createToken($userID);
-				$encoded_token = $token->getToken();		
-// echo "created user and token";
+				// use SLIM's environment object to set store user id and flags to
+				// send proper API response (see Response.php)
+				$env = $app->environment();
+				$env["userID"] = $userID;
+				$env["createTokenFlag"] = true; // Response object will send token
+				$env["createUserFlag"] = true; // Response object will send user info
+				
 				// generate success response
 				$status = 200;
-				$response["message"] = "Welcome to MyIntent!  To get started, please share meaningful word and story.";
-				$response["token"] = $encoded_token;
-				$response["user"] = $user->makeUserObj();
+				$message = "Welcome to MyIntent!  To get started, please share meaningful word and story.";
 			}
 			else
 			{
-// echo "Oh crap";		
 				// generate error response
 				$status = 500;
-				$response["message"] = "Please try again";				
+				$message = "Please try again";				
 			}
 		}
-	sendResponse($status, $response);
+
+	// send response
+	$response = new Response();
+	$response->send($status, $message);
 }
 
 ?>
