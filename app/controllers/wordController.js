@@ -2,7 +2,7 @@
 
 /* Controllers */
 // "controllers" is declared in sessionController.js
-controllers.controller('WordController', function ($scope, $location, wordServices, wordAPIServices, userServices) {
+controllers.controller('WordController', function ($rootScope, $scope, $location, wordServices, wordAPIServices, userServices) {
 
 	$scope.user = {
 		firstName: userServices.getUser().firstName,

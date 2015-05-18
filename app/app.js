@@ -18,16 +18,28 @@ myIntentProject.constant("urls", {
 	BASE_API: "api/", // or BASE_API: "http://localhost/myIntent/api"
 	BASE_APP: "app/", //	or BASE_APP: "http://localhost/myIntent/app"
 });
- 
+
+// A JSON object that contains a function that resolves the token refresh process in 
+// $routeProvider.  This function is used for restricted routes to detect when a 
+// "logged in" user does a "hard url reload" which triggers a token refresh.
+var tokenRefreshResolver = {
+	tokenRefresh: function(sessionServices, sessionAPIServices){
+					if (sessionServices.getRefreshingToken() == true)
+						{
+							// send token refresh request to API
+							return(sessionAPIServices.refreshToken());
+						}	
+					}
+}
+
 // ROUTES
 myIntentProject.config(["$routeProvider", "$httpProvider", "$locationProvider", "urls", "jwtInterceptorProvider",
 	function($routeProvider, $httpProvider, $locationProvider, urls, jwtInterceptorProvider) {
 		$routeProvider.
 			when("/", { // path is relative to "localhost/projects/myIntent/public/"
 				templateUrl: urls.BASE_APP + "templates/show_words.html",
-				controller: "WordController"
-//				templateUrl: urls.BASE_APP + "templates/log_in.html", // path is relative to "myIntent/public/index.html"
-//				controller: "SessionController" // specifying controller here makes it unnecessary to specify the controller in the html
+				controller: "WordController",
+				resolve: tokenRefreshResolver
 			}).
 			when("/sign_up", {
 				templateUrl: urls.BASE_APP + "templates/sign_up.html",
@@ -39,11 +51,13 @@ myIntentProject.config(["$routeProvider", "$httpProvider", "$locationProvider", 
 			}).	  
 			when("/create_word", {
 				templateUrl: urls.BASE_APP + "templates/create_word.html",
-				controller: "WordController"
+				controller: "WordController",
+				resolve: tokenRefreshResolver
 			}).
 			when("/show_words", {
 				templateUrl: urls.BASE_APP + "templates/show_words.html",
-				controller: "WordController"
+				controller: "WordController",			
+				resolve: tokenRefreshResolver
 			}).
 			otherwise({ 
 				redirectTo: '/' 
@@ -82,28 +96,21 @@ myIntentProject.run(function($rootScope, $location, sessionServices, sessionAPIS
 	var basicRoutes = ["/log_in", "/sign_up"]; // "log in" and "sign up" pages only
 	var showWordsRoutes = ["/", "/show_words"] // "show words" page
 
-	$rootScope.$on('$locationChangeStart', function(event, next, current){
-
-		// get a refresh token if logged in user is opening up application directly via url (vs. clicking to it)
-		if (sessionServices.loggedIn() && current == next) // current == undefined when directly accessing page via url
-		{			
-			// hide page while refreshing token
-			sessionServices.setRefreshingToken(true);
-			
-			// send token refresh request to API
-			sessionAPIServices.refreshToken();
-		}	
-	});	
-	
 	$rootScope.$on('$routeChangeStart', function (event, next, current) {
 //	To figure out the properties and values of the "next" object:
 //		for(var propertyName in next) {
 //			console.log("next property: " + propertyName + " : " + next[propertyName]);   
 //		}
-		
+
+		// if logged in user performs hard reload on url, then need to refresh token
+		if (current == undefined && sessionServices.loggedIn())
+		{
+			sessionServices.setRefreshingToken(true); // flag to tell $routeProvider resolve that token is being refreshed
+		}
+	
 		// Scenario 1: if user is accessing restricted content, user needs to be logged in
 		if (publicRoutes.indexOf(next.originalPath) == -1 && !sessionServices.loggedIn()) // restricted content
-		{	
+		{
 			if(!sessionServices.loggedIn()) // user not logged in
 			{
 				$location.path("/log_in"); // direct user to "log in" page
@@ -120,9 +127,9 @@ myIntentProject.run(function($rootScope, $location, sessionServices, sessionAPIS
 		}
 
 		// Scenario 3: if user is logged on, then prevent him from going back to "log in" or "sign up" pages
-		if(basicRoutes.indexOf(next.originalPath) == 0 && sessionServices.loggedIn())
+		if(basicRoutes.indexOf(next.originalPath) >= 0 && sessionServices.loggedIn())
 		{
-			event.preventDefault();
+			$location.path("/");
 		}
 
 	});

@@ -35,13 +35,11 @@ services.factory("sessionServices", function($localStorage, $sessionStorage, $lo
 	service.getToken = function(){
 		return $localStorage.token;
 	};
-		
-	// used in MainController to show/hide <body> in index.html
+
 	service.setRefreshingToken = function(ready) {
 		refreshingToken = ready;
 	};
 
-	// used in MainController to show/hide <body> in index.html
 	service.getRefreshingToken = function() {
 		return refreshingToken;
 	};

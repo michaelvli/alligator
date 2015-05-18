@@ -61,16 +61,28 @@ services.factory("sessionAPIServices", function($http, $location, urls, sessionS
 			method: "POST",
 			url: urls.BASE_API + "refresh_token"
 		}
-	
-		var refreshRequest = $http(request).success(function(data, status, headers, config){
-				// hide page while refreshing token
-				sessionServices.setRefreshingToken(false);
-			}).error(function(data, status, headers, config){
-				// log out user
-				sessionServices.logout();
-			});
 		
-		return refreshRequest;
+		// using native javascript promises - may require polyfill
+		var promise = new Promise(function(resolve, reject){
+			// make http request to refresh token
+			$http(request).success(function(data, status, headers, config){
+				// on success, set refresh token flag to indicate refresh is done
+				resolve(sessionServices.setRefreshingToken(false));
+			}); // otherwise, error should handled via responseErrorInterceptor.js
+			// NOTE: don't want error to resolve bc it will cause the "old" page to flash before user is redirected to "log in" page
+		});
+		return promise;
+		
+/*		// using $q service for promises
+		var deferred = $q.defer();
+		
+		$http(request).success(function(data, status, headers, config){
+			// hide page while refreshing token
+			deferred.resolve(sessionServices.setRefreshingToken(false));
+		}); // error is handled via responseErrorInterceptor.js
+		
+		return deferred.promise;
+*/		
 	};
 
 	return service;
