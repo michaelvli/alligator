@@ -95,7 +95,6 @@ require "routes/wordCallbacks.php";
 
 	// Routes - Words
 	$app->post("/create_word","createWord");
-	$app->get("/show_words","showWords");
 
 //});
 

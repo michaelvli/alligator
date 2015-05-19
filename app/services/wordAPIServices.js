@@ -12,14 +12,14 @@
 "use strict"; // all variables must be declared
 
 // "services" is declared in sessionServices.js
-services.factory("wordAPIServices", function($http, urls){
+services.factory("wordAPIServices", function($http, $location, urls, wordServices){
 	
 	var service = {}; // declaration of object that will be returned to calling controller
 	
 	/* public methods via the service object below: */
 	
 	// creating a new word
-	service.createWord = function(dataObj, successResponse, errorResponse){
+	service.createWord = function(dataObj){
 		
 		var request = {
 			method: "POST",
@@ -27,23 +27,20 @@ services.factory("wordAPIServices", function($http, urls){
 			params: dataObj // passing "params" (vs. "data") - means API will need to use SLIM's $app->request()->params("email") (vs. $app->request()->getBody()->email followed by json_decode($request)->email)
 		};
 	
-		var showWordsRequest = $http(request).success(successResponse).error(errorResponse);
+		var showWordsRequest = $http(request).success(function(data, status, headers, config){
+//			console.log(data.message);
+			
+			// store words and array index of current word into wordServices
+			wordServices.setWords(data.words, data.currentWordIndex);
+
+			// take user to "show words" page
+			$location.path("/show_words"); // http://stackoverflow.com/questions/14201753/angular-js-how-when-t
+		}).error(function(data, status, headers, config){
+//			console.log(data.message);
+		});
 		
 		return showWordsRequest;
 	}
-	
-	// logged in user getting all words
-	service.showWords = function(successResponse, errorResponse){
-		
-		var request = {
-			method: "GET",
-			url: urls.BASE_API + "/show_words"
-		};
-	
-		var showWordsRequest = $http(request).success(successResponse).error(errorResponse);
-		
-		return showWordsRequest;
-	}	
 
 	return service;
 });
