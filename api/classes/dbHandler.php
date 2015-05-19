@@ -73,7 +73,7 @@ class dbHandler{
 	public function select_Users_email($email)
 	{	
 		// for more info on using prepared statements, see http://stackoverflow.com/questions/767026/how-can-i-properly-use-a-pdo-object-for-a-select-query
-		$sql = "SELECT id, passwordHash, email, firstName, lastName, birthday FROM users WHERE email = :email";
+		$sql = "SELECT * FROM users WHERE email = :email";
 		$sql = $this->db->prepare($sql);
 		$sql->bindParam(":email", $email);
 		if ($sql->execute()) // execute() returns true on success and false on failure
@@ -182,7 +182,7 @@ class dbHandler{
 //echo json_encode($injectorArray);
 				
 		// for more info on using prepared statements, see http://stackoverflow.com/questions/767026/how-can-i-properly-use-a-pdo-object-for-a-select-query
-		$sql = "INSERT INTO users (firstName, lastName, email, passwordHash, birthday) VALUES (:firstName, :lastName, :email, :passwordHash, :birthday)";		
+		$sql = "INSERT INTO users (firstName, lastName, email, passwordHash, birthday, flagged) VALUES (:firstName, :lastName, :email, :passwordHash, :birthday, :flagged)";		
 		$sql = $this->db->prepare($sql);
 		
 		if ($sql->execute($injectorArray)) // execute() returns true on success and false on failure
@@ -199,7 +199,7 @@ class dbHandler{
 	private function getCurrentWord($userID){
 		// for more info on using prepared statements, see http://stackoverflow.com/questions/767026/how-can-i-properly-use-a-pdo-object-for-a-select-query
 		
-		$sql = "SELECT id, user_id, word, story, dateCreated, currentWord FROM words WHERE currentWord = true AND user_id = :userID";
+		$sql = "SELECT * FROM words WHERE currentWord = true AND user_id = :userID";
 		$sql = $this->db->prepare($sql);
 		$sql->bindParam(":userID", $userID);
 		if ($sql->execute()) // execute() returns true on success and false on failure

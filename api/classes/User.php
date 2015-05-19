@@ -35,7 +35,8 @@ class User {
 	private $password; // user entered password - this value is NOT stored in db
 	private $passwordHash; // system-generated/db-stored hash - this value NOT entered by user
 	private $birthday;
-
+	private $flagged;
+	
 	// dynamically load constructor with an array
 	public function __construct($injector_obj)
 	{							
@@ -77,6 +78,7 @@ class User {
 		$this->firstName = $row_obj->firstName;
 		$this->lastName = $row_obj->lastName;
 		$this->birthday = $row_obj->birthday;
+		$this->flagged = $row_obj->flagged;
 		
 		// db doesn't contain a column that stores an unhashed password
 		$this->passwordHash = $row_obj->passwordHash; // passwordHash is first set in the class here
@@ -102,6 +104,14 @@ class User {
 		$row_obj = $db->select_Users_id($this->id);
 		$this->loadDbRow($row_obj);
 		return true;
+	}
+	
+	public function getFlagStatus(){
+		if ($this->flagged == true)
+		{
+			return true;
+		}	
+		return false;
 	}
 	
 	// check to see if hash and password match

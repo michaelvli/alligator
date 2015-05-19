@@ -6,7 +6,10 @@ services.factory("responseErrorInterceptor", function($q, $location, sessionServ
 	var service = {};	
 
 	service.responseError = function(rejection){
-		if (rejection.status === 401)
+		// http status codes:
+		// 401 - not authorized (username does not exist, wrong password, invalid token)
+		// 403 - forbidden (user account was flagged)
+		if (rejection.status === 401 || rejection.status === 403)
 		{
 			sessionServices.logout();
 		}

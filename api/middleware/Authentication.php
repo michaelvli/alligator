@@ -47,19 +47,36 @@
 					$env = $app->environment();
 					$env["userID"] = $token->getTokenClaim("user_id");
 
-					// if validated token (i.e. not expired) is one or more hours old, then refresh token
-					$issued_at = $token->getTokenClaim("iat"); // time (in unix) issued
-					$date = new DateTime();
-					$currentTime = $date->getTimestamp(); // current time (in unix)
-					$difference = ($currentTime - $issued_at); // in seconds
-					if ($difference >= 60*60) // if token is more than 1 hour old, then create a new token
+					// check if user has been flagged
+					$injector = new Injector();
+					$injector = $injector ->load("id", $env["userID"])->
+											getObj();
+					$user = new User($injector);
+					$user->fillByID();
+					
+					if ($user->getFlagStatus() === true)
 					{
-						// use SLIM's environment object to set createToken flag (used in sendResponse.php)
-						$env["createTokenFlag"] = true;
-					}	
-										
-					$this->next->call(); // call next middleware or the callback
-				}
+						$status = 403;
+						$message = "Please contact us about your account";
+						$response = new Response();
+						$response->send($status, $message);
+					}
+					else // user has not been flagged
+					{
+						// if validated token (i.e. not expired) is one or more hours old, then refresh token
+						$issued_at = $token->getTokenClaim("iat"); // time (in unix) issued
+						$date = new DateTime();
+						$currentTime = $date->getTimestamp(); // current time (in unix)
+						$difference = ($currentTime - $issued_at); // in seconds
+						if ($difference >= 60*60) // if token is more than 1 hour old, then create a new token
+						{
+							// use SLIM's environment object to set createToken flag (used in sendResponse.php)
+							$env["createTokenFlag"] = true;
+						}	
+											
+						$this->next->call(); // call next middleware or the callback	
+					}
+									}
 				else // friendly forward
 				{
 					$status = 401;
