@@ -2,6 +2,7 @@
 /vendor/
 /api/SQL/
 /api/config/
+/api/templates/
 /node_modules/
 /test
 karma.conf.js

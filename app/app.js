@@ -11,14 +11,23 @@ var myIntentProject = angular.module("myIntentProject", [
   "angular-jwt"
 ]);
 
-
 // Constants
-myIntentProject.constant("urls", {
-	BASE: "/", // or	BASE: "http://localhost/myIntent"
-	BASE_API: "api/", // or BASE_API: "http://localhost/myIntent/api"
-	BASE_APP: "app/", //	or BASE_APP: "http://localhost/myIntent/app"
-});
-
+if (document.domain == "localhost") // development environment
+{
+	myIntentProject.constant("urls", {
+		BASE: "/", // or	BASE: "http://localhost/myIntent"
+		BASE_API: "api/", // or BASE_API: "http://localhost/myIntent/api"
+		BASE_APP: "app/", //	or BASE_APP: "http://localhost/myIntent/app"
+	});
+}
+else // production environment
+{
+	myIntentProject.constant("urls", {
+		BASE: "/", // or	BASE: "http://localhost/myIntent"
+		BASE_API: "api.myintent.org/api/", // or BASE_API: "http://localhost/myIntent/api"
+		BASE_APP: "app/", //	or BASE_APP: "http://localhost/myIntent/app"
+	});
+}
 // A JSON object that contains a function that resolves the token refresh process in 
 // $routeProvider.  This function is used for restricted routes to detect when a 
 // "logged in" user does a "hard url reload" which triggers a token refresh.
